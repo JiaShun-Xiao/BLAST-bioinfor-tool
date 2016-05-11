@@ -12,8 +12,8 @@ This is the course project for Bioinformatics(BI3204 2015.09-2016.01) at [SUSTC]
 
 ##Introduction to BLAST
 
-![1](./images/1.jpg =300X300)
-![2](./images/2.jpg =100x100)
+![1](./images/1.jpg)
+<img src="./images/2.jpg" width=700 height=700 />
 ![3](./images/3.png)
 
 >In bioinformatics, BLAST for Basic Local Alignment Search Tool is an algorithm for comparing primary biological sequence information, such as the amino-acid sequences of different proteins or the nucleotides of DNA sequences. A BLAST search enables a researcher to compare a query sequence with a library or database of sequences, and identify library sequences that resemble the query sequence above a certain threshold.
