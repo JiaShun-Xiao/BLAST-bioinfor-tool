@@ -6,7 +6,7 @@ This is the course project for Bioinformatics(BI3204 2015.09-2016.01) at [SUSTC]
 **Table of Contents**
 
 - [Introduction to BLAST](#Introduction-to-BLAST)
-- [BLAST implementation in python: For human genome](#BLAST-implementation-in-python:-For-human-genome)
+- [BLAST implementation in python: For human genome](#blast-implementation-in-python:-for-human-genome)
   - [construct library](#construct-library)
   - [alignment algrithms](#alignment-algrithms)
 
