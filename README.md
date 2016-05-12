@@ -44,6 +44,10 @@ python construct_library.py
 
 <img src="./images/5-2.png" width=700 height=400 />
 >Compare all locations between each 11 bases length words of query sequences. for each words, it will have many location in each chromosome, but only one of them is the right location of query sequnce. for example, as we can see in figue above, word x have locations: a, b, **c**, d..., c is the right location; word x+1 have locations: e, f, **c+1**, g........... c+1 is the right location. Thus, if the query sequence have no mutation and gaps, all the words will have a location like that: **c, c+1, c+2, c+3, c+4..........** besides, if the query sequence have mutation or gaps, all the words will have a location like that: **c, c+1, c+2, c+3,----------------,c+14,c+15.... **in orther words, a mutation or gaps will cause 11 wods have no right location. Then, for words from first one to last, locations of each word add length(query) - i, i is the index of words, so we can get the new locations like that: **c+length(query), c+1+length(query)-1, c+2+length(query)-2............. **, finally, we can find the right location of the highest repeated location:**c+length(query)**, and we can select the bigger threshold of the highest repeated location just like we select the highly similar sequence in NCBI BLAST. the result figure is showed below, we can see the time to find the location and finish sequence alignment  only need 2 seconds.
-
+```bash 
+python blast.py 
+# finally, input query sequence in blast.py 
+# this will output location and Smith,Waterman alignment result.
+```
 <img src="./images/blast.png" width=700 height=400 />
 
