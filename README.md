@@ -1,7 +1,5 @@
 # python implement fast BLAST 
-Python implementation of Basic Local Alignment Search Tool (BLAST) , which is the core algorithm in sequence alignmenrt for genomes and only need 2 seconds to output location and Smith,Waterman alignment result.
-
-This is the course project for Bioinformatics(BI3204 2015.09-2016.01) at [SUSTC](http://www.sustc.edu.cn/).
+Python implementation of Basic Local Alignment Search Tool (BLAST) , which is the core algorithm in sequence alignment for genomes and only need 2 seconds to output location and Smith,Waterman alignment result.
 
 **Table of Contents**
 
@@ -12,12 +10,7 @@ This is the course project for Bioinformatics(BI3204 2015.09-2016.01) at [SUSTC]
 
 ## Introduction to BLAST
 
-<img src="./images/1.jpg" width=400 height=500 />
-<img src="./images/2.jpg" width=400 height=500 />
-<img src="./images/3.png" width=400 height=500 />
 > In bioinformatics, BLAST for Basic Local Alignment Search Tool is an algorithm for comparing primary biological sequence information, such as the amino-acid sequences of different proteins or the nucleotides of DNA sequences. A BLAST search enables a researcher to compare a query sequence with a library or database of sequences, and identify library sequences that resemble the query sequence above a certain threshold.
-
-> BLAST.  In Wikipedia. Retrieved May 12, 2016, from https://en.wikipedia.org/wiki/BLAST
 
 ## BLAST implementation in python: For human genome
 
@@ -25,17 +18,21 @@ This is the course project for Bioinformatics(BI3204 2015.09-2016.01) at [SUSTC]
 <img src="./images/4.png" width=500 height=400 />
 >Construct library for human genome. Break whole genome sequence into **11** bases length words overlappedly (**respectively for each chromosome**), every word as a name of a txt file which contain all location of this words in genome sequence. So was the query reads.
 #### Detail programing 
-```bash 
+
+```bash
 python chromosome.py hg19.fa
 # firstly, cut hg19.fa into individual chromosomes 
 # this will output 25 txt file.
 ```
+
 <img src="./images/chromosome.png" width=400 height=500 />
+
 ```bash
 python construct_library.py 
 # secondly, cut each chromosme into 11 bases length words overlappedly.
 # this will output total 37G files.
 ```
+
 <img src="./images/library.png" width=700 height=400 />
 
 ### alignment algorithms
@@ -50,5 +47,6 @@ python blast.py
 # finally, input query sequence in blast.py 
 # this will output location and Smith,Waterman alignment result.
 ```
+
 <img src="./images/blast.png" width=700 height=400 />
 
