@@ -1,12 +1,10 @@
 __author__ = 'Jiashun'
 import re
-import time
 import numpy as np
 from collections import Counter
 from math import ceil
 from math import floor
 
-starts = time.clock()
 # compare single base
 def SingleBaseCompare(seq1,seq2,i,j):
     if seq1[i] == seq2[j]:
@@ -115,8 +113,6 @@ def WordToIndex(word,word_len):
 # Get word's postion in genome from library
 def GetWordPos(word):
     assert len(word)== 11
-    ### remove
-    chr_names = ['1','2']
     seek_index = WordToIndex(word,11-1)
     positions = []
     for chr_name in chr_names:
@@ -145,8 +141,7 @@ def Blast(query_seq):
     words_positions = []
     for word in query_words:
         words_positions.append(GetWordPos(word))
-    #for chr_index in range(24):
-    for chr_index in range(2):
+    for chr_index in range(24):
         for word_index in range(words_length):
             for pos in range(len(words_positions[word_index][chr_index])):
                 words_positions[word_index][chr_index][pos] += words_length - word_index - 1
@@ -163,7 +158,7 @@ def Blast(query_seq):
             if words_positions_corrects_count[count_] > 5:
                 finded_postions.append(count_)
         if finded_postions:
-            chr_seq = open('/home/jxiaoae/class/blast/chromosome_{}_library.txt'.format(chr_name),'r')
+            chr_seq = open('/home/jxiaoae/class/blast/chromosome_{}_library.txt'.format(chr_names[chr_index]),'r')
             chr_seq = chr_seq.read().strip()
             for finded_postion in finded_postions:
                 candidate_seq_pos = finded_postion - query_seq_length + 11 - 5
@@ -181,13 +176,14 @@ def Blast(query_seq):
                 i_end = np.array(i_end_indexs).argmax()+1
                 candidate_sequence = candidate_sequence[i_start:-i_end]
                 align_seq1,align_seq2,align_score = SMalignment(candidate_sequence,query_seq)
-                print("find in chromosome "+chr_names[chr_index]+": "+str(candidate_seq_pos+i_start)+' ---> '+str(candidate_seq_pos+i_start+len(candidate_sequence)-1)+" ,align score: "+str(align_score))
-                Display(align_seq1, align_seq2)
-        return None
+                if align_score>0.7:
+                    print("find in chromosome "+chr_names[chr_index]+": "+str(candidate_seq_pos+i_start)+' ---> '+str(candidate_seq_pos+i_start+len(candidate_sequence)-1)+", align score: "+str(align_score))
+                    Display(align_seq1, align_seq2)
+    return None
 
 if __name__ == "__main__":
-    chr_names = [str(i+1) for i in range(22)]+['X','Y']
+    chr_names = np.load('/home/jxiaoae/class/blast/GRCh37_chr_names.npy')
     chrom_seek_index = np.load('/home/jxiaoae/class/blast/GRCh37_chrom_seek_index.npy')
     hg19 = open("/home/share/GRCh37/human_g1k_v37.fasta")
-    query_sequence = 'AAATGTGTTGCTGTAGTTTGTTATTAGACCCCTTCTTTCCATTGG'
+    query_sequence = 'GTATCGGAACTTCCAACTTGTAGGCAAAATAGATATGCTTCATATTCTTAAAAACCACAAGAAA'
     Blast(query_sequence)

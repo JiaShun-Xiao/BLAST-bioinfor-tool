@@ -2,7 +2,7 @@ from numba import jit
 import numpy as np
 import re
 from multiprocessing import Pool
-
+from math import ceil
 
 @jit
 def BaseToNum(chr_seq):
@@ -58,8 +58,10 @@ if __name__ == '__main__':
     hg19 = open("/home/share/GRCh37/human_g1k_v37.fasta")
     head = True
     chrom_dict = {}
+    head_line = []
     for line in hg19:
         if re.match(r">[1-9X-Y]|[12][0-9]",line):
+            head_line.append(line)
             if head:
                 head = False
             else:
@@ -75,8 +77,12 @@ if __name__ == '__main__':
     chr_seq = chr_seq.upper()
     chrom_dict[chr_name] = chr_seq
     chr_names = list(chrom_dict.keys())
-    chr_names.remove('1')
-    chr_names.remove('2')
+    chrom_seek_index = np.array([[int(line.split(":")[-2]),len(line)] for line in head_line])
+    for i in range(1,24):
+        chrom_seek_index[i,1]=chrom_seek_index[i,1]+chrom_seek_index[i-1,1]+chrom_seek_index[i-1,0]+ceil(chrom_seek_index[i-1,0]/60)
+    np.save('/home/jxiaoae/class/blast/GRCh37_chrom_seek_index.npy',chrom_seek_index)
+    np.save('/home/jxiaoae/class/blast/GRCh37_chr_names.npy',np.array(chr_names))
     print(chr_names)
+    # reset multiprocessing num according to your server
     with Pool(10) as p:
         p.map(BuildLibrary, chr_names)
