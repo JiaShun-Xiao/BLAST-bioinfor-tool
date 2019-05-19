@@ -120,7 +120,10 @@ def GetWordPos(word):
         seeks = np.load("chromosome_{}_library_seeks.npy".format(chr_name))
         chr_seq.seek(seeks[seek_index,0])
         position = chr_seq.read(seeks[seek_index,1])
-        positions.append(list(map(int, position[:-1].split(","))))
+        try:
+            positions.append(list(map(int, position[:-1].split(","))))
+        except:
+            positions.append([])
     return positions
 
 # Extract subsequence from GRCh37 file
