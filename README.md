@@ -4,7 +4,7 @@ Python implementation of Basic Local Alignment Search Tool (BLAST) , which is th
 **Table of Contents**
 
 - [Introduction to BLAST](#Introduction-to-BLAST)
-- [BLAST implementation in python: For human genome](#blast-implementation-in-python:-for-human-genome)
+- [BLAST implementation in python: For human genome](#Blast-implementation-in-python:-for-human-genome)
   - [construct library](#construct-library)
   - [alignment algrithms](#alignment-algrithms)
 
@@ -39,5 +39,7 @@ python blast.py
 # this will output location and Smith,Waterman alignment result.
 ```
 
-<img src="./images/blast-result.png" width=600  />
+<img src="./images/blast-result.png" width=700  />
+
+
 
