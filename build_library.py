@@ -59,6 +59,7 @@ if __name__ == '__main__':
     head = True
     chrom_dict = {}
     head_line = []
+    chr_names = []
     for line in hg19:
         if re.match(r">[1-9X-Y]|[12][0-9]",line):
             head_line.append(line)
@@ -69,6 +70,7 @@ if __name__ == '__main__':
                 chr_seq = chr_seq.upper()
                 chrom_dict[chr_name] = chr_seq
             chr_name = line.split()[0][1:]
+            chr_names.append(chr_name)
             chr_seq = ''
             print(chr_name,end=",")
         else:
@@ -76,7 +78,6 @@ if __name__ == '__main__':
     chr_seq = re.sub(r'\n', '', chr_seq)
     chr_seq = chr_seq.upper()
     chrom_dict[chr_name] = chr_seq
-    chr_names = list(chrom_dict.keys())
     chrom_seek_index = np.array([[int(line.split(":")[-2]),len(line)] for line in head_line])
     for i in range(1,24):
         chrom_seek_index[i,1]=chrom_seek_index[i,1]+chrom_seek_index[i-1,1]+chrom_seek_index[i-1,0]+ceil(chrom_seek_index[i-1,0]/60)
