@@ -161,8 +161,6 @@ def Blast(query_seq):
             if words_positions_corrects_count[count_] > 5:
                 finded_postions.append(count_)
         if finded_postions:
-            chr_seq = open('/home/jxiaoae/class/blast/chromosome_{}_library.txt'.format(chr_names[chr_index]),'r')
-            chr_seq = chr_seq.read().strip()
             for finded_postion in finded_postions:
                 candidate_seq_pos = finded_postion - query_seq_length + 11 - 5
                 candidate_seq_length = query_seq_length + 11
