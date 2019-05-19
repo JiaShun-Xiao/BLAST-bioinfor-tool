@@ -1,21 +1,21 @@
 __author__ = 'Jiashun'
 import re
 import time
-import os
-import string
+import numpy as np
 from collections import Counter
+from math import ceil
+from math import floor
 
 starts = time.clock()
-
-
-def s(si_, sj_):
-    if qu[si_] == seq2[sj_]:
+# compare single base
+def SingleBaseCompare(seq1,seq2,i,j):
+    if seq1[i] == seq2[j]:
         return 2
     else:
         return -1
-
-
-def alignment(seq1, seq2):
+    
+# Smith–Waterman Alignment 
+def SMalignment(seq1, seq2):
     m = len(seq1)
     n = len(seq2)
     g = -3
@@ -31,7 +31,7 @@ def alignment(seq1, seq2):
         matrix[0][sjj] = sjj*g
     for siii in range(1, m):
         for sjjj in range(1, n):
-            matrix[siii][sjjj] = max(matrix[siii-1][sjjj] + g, matrix[siii - 1][sjjj - 1] + s(siii, sjjj), matrix[siii][sjjj-1] + g)
+            matrix[siii][sjjj] = max(matrix[siii-1][sjjj] + g, matrix[siii - 1][sjjj - 1] + SingleBaseCompare(seq1,seq2,siii, sjjj), matrix[siii][sjjj-1] + g)
     sequ1 = [seq1[m-1]]
     sequ2 = [seq2[n-1]]
     while m > 1 and n > 1:
@@ -50,141 +50,144 @@ def alignment(seq1, seq2):
             sequ2.append('-')
     sequ1.reverse()
     sequ2.reverse()
-    seque1 = string.join(sequ1, '')
-    seque2 = string.join(sequ2, '')
-    global score
-    score = 0
-    for k in range(0, len(seque1)):
-        if seque1[k] == seque2[k]:
-            score += 1
-    score = float(score)/len(seque2)
-    return seque1, seque2
+    align_seq1 = ''.join(sequ1)
+    align_seq2 = ''.join(sequ2)
+    align_score = 0.
+    for k in range(0, len(align_seq1)):
+        if align_seq1[k] == align_seq2[k]:
+            align_score += 1
+    align_score = float(align_score)/len(align_seq1)
+    return align_seq1, align_seq2, align_score
 
-
-def display(seque1, seque2):
-    le = 40
+# Display BlAST result
+def Display(seque1, seque2):
+    le = 60
     while len(seque1)-le >= 0:
-        print 'sequence1: ',
+        print('sequence1: ',end='')
         for a in list(seque1)[le-40:le]:
-            print a,
-        print "\n"
-        print '           ',
+            print(a,end='')
+        print("\n")
+        print('           ',end='')
         for k in range(le-40, le):
             if seque1[k] == seque2[k]:
-                print '|',
+                print('|',end='')
             else:
-                print ' ',
-        print "\n"
-        print 'sequence2: ',
+                print(' ',end='')
+        print("\n")
+        print('sequence2: ',end='')
         for b in list(seque2)[le-40:le]:
-            print b,
-        print "\n"
+            print(b,end='')
+        print("\n")
         le += 40
     if len(seque1) > le-40:
-        print 'sequence1: ',
+        print('sequence1: ',end='')
         for a in list(seque1)[le-40:len(seque1)]:
-            print a,
-        print "\n"
-        print '           ',
+            print(a,end='')
+        print("\n")
+        print('           ',end='')
         for k in range(le-40, len(seque1)):
             if seque1[k] == seque2[k]:
-                print '|',
+                print('|',end='')
             else:
-                print ' ',
-        print "\n"
-        print 'sequence2: ',
+                print(' ',end='')
+        print("\n")
+        print('sequence2: ',end='')
         for b in list(seque2)[le-40:len(seque2)]:
-            print b,
-        print "\n"
+            print(b,end='')
+        print("\n")
 
+# transform base to numeric value
+def WordToNum(word):
+    tmp = []
+    trans = {'A':1,'C':2,'G':3,'T':4}
+    for w in word:
+        tmp.append(trans[w])
+    return tmp
 
-def split_w(w):
-    loc = dict()
-    loc[w] = []
-    if os.path.exists('/2_disk/xiaojs/python/blast/library/'+w):
-        fin = open('/2_disk/xiaojs/python/blast/library/'+w, 'r')
-        for ii in range(1, 26):
-            loc[w].append([])
-        for line in fin:
-            if re.match(r"[\d]:(.*)", line):
-                ch = line[0:1]
-            elif re.match(r"[\d]{2}:(.*)", line):
-                ch = line[0:2]
-            else:
-                line = map(int, (line.split()))
-                loc[w][int(ch)-1] = line
-        fin.close()
-        return loc[w]
-    else:
-        for i in range(0, 25):
-            loc[w].append([])
-        return loc[w]
+# transform word with 11 bases to its index
+def WordToIndex(word,word_len):
+    tmp = 0
+    word_num = WordToNum(word)
+    for i,v in enumerate(word_num):
+        tmp += (v-1)*4**(word_len-i)
+    return tmp   
 
+# Get word's postion in genome from library
+def GetWordPos(word):
+    assert len(word)== 11
+    ### remove
+    chr_names = ['1','2']
+    seek_index = WordToIndex(word,11-1)
+    positions = []
+    for chr_name in chr_names:
+        chr_seq = open('/home/jxiaoae/class/blast/chromosome_{}_library.txt'.format(chr_name),'r')
+        seeks = np.load("chromosome_{}_library_seeks.npy".format(chr_name))
+        chr_seq.seek(seeks[seek_index,0])
+        position = chr_seq.read(seeks[seek_index,1])
+        positions.append(list(map(int, position[:-1].split(","))))
+    return positions
 
-def chromosome(words):
-    loc = dict()
-    for w in words:
-        loc[w] = split_w(w)
-    lenw = len(loc)
-    global qu
-    lenq = len(qu)
-    qu_ = qu[0:6]
-    qu__ = qu[-6:len(qu)]
-    for j in range(0, 25):
-        for ww in range(0, lenw-1):
-            for jj in range(0, len(loc[words[ww]][j])):
-                loc[words[ww]][j][jj] += lenw - ww - 1
-        chj = []
-        for www in words:
-            chj += loc[www][j]
-        chjj = Counter(chj)
-        local = []
-        for chjj_ in chjj:
-            # we can select the bigger threshold of chjj[chjj_] just like we select the highly similar sequence in NCBI BLAST
-            if chjj[chjj_] > 5:
-                local.append(chjj_)
-        if local:
-            chromo = open('/2_disk/xiaojs/python/blast/chrom/chromosome'+str(change[j+1])+".txt", 'r')
-            chromoso = chromo.read().strip()
-            for local_ in local:
-                temp = chromoso[local_-lenq:local_+15]
-                for iii in range(0, lenq):
-                    if temp[iii:iii+5].upper() in qu_:
-                        break
-                for iiii in range(0, 15):
-                    if temp[-5-iiii:len(temp)-iiii].upper() in qu__:
-                        break
-                global seq2
-                seq2 = temp[iii:len(temp)-iiii].upper()
-                (seque1, seque2) = alignment(qu, seq2)
-                if score > 0.5:
-                    print "find in chromosome"+str(j+1)
-                    print str(local_-lenq+iii)+' ---> '+str(local_+lenq-iiii)
-                    print temp[iii:len(temp)-iiii]+"\n"
-                    display(seque1, seque2)
-                    print "the score is "+str(score)+"\n"
-            chromo.close()
-        if not local:
-            continue
+# Extract subsequence from GRCh37 file
+def ExtractSeq(chr_index,pos,length):
+    pos = pos+floor(pos/60)
+    hg19.seek(chrom_seek_index[chr_index,1]+pos-1)
+    return re.sub(r'\n', '', hg19.read(length))
 
-#  qu is the query sequence
-qu = 'CTAAAACCAAGAGCGGGAGGGGACGGGGCTGCCGCAGCCCTCCCAGA'
-#qu = 'ACTGCCAGACACATTCATGACCTAATCCCTACATTAGCATAAGAGGGCACACTCTCCTCCTATGGGGGAAACTGAGGTACGAAGAget_local.pyACTAAAGTGACTTTCCCACAGCTGGTGGGAGGCAGACGGGAAATTCACA'
+# main blast function
+def Blast(query_seq):
+    i = 0
+    query_words = []
+    query_seq_length = len(query_seq)
+    words_length = query_seq_length-11+1
+    while i < words_length:
+        query_words.append(query_seq[i:i+11])
+        i += 1
+    words_positions = []
+    for word in query_words:
+        words_positions.append(GetWordPos(word))
+    #for chr_index in range(24):
+    for chr_index in range(2):
+        for word_index in range(words_length):
+            for pos in range(len(words_positions[word_index][chr_index])):
+                words_positions[word_index][chr_index][pos] += words_length - word_index - 1
+        
+        words_positions_corrects = []
+        for word_index in range(words_length):
+            words_positions_corrects += words_positions[word_index][chr_index]
+        
+        words_positions_corrects_count = Counter(words_positions_corrects)
+        finded_postions = []
+        for count_ in words_positions_corrects_count:
+            # we can select the bigger threshold of words_positions_corrects_count[count_] just 
+            # like we select the highly similar sequence in NCBI BLAST
+            if words_positions_corrects_count[count_] > 5:
+                finded_postions.append(count_)
+        if finded_postions:
+            chr_seq = open('/home/jxiaoae/class/blast/chromosome_{}_library.txt'.format(chr_name),'r')
+            chr_seq = chr_seq.read().strip()
+            for finded_postion in finded_postions:
+                candidate_seq_pos = finded_postion - query_seq_length + 11 - 5
+                candidate_seq_length = query_seq_length + 11
+                candidate_sequence = ExtractSeq(chr_index,candidate_seq_pos,candidate_seq_length)
+                i_start_indexs = []
+                for i_start in range(15):
+                    _,_,score = SMalignment(candidate_sequence[i_start:],query_seq)
+                    i_start_indexs.append(score)
+                i_start = np.array(i_start_indexs).argmax()
+                i_end_indexs = []
+                for i_end in range(1,16):
+                    _,_,score = SMalignment(candidate_sequence[:-i_end],query_seq)
+                    i_end_indexs.append(score)
+                i_end = np.array(i_end_indexs).argmax()+1
+                candidate_sequence = candidate_sequence[i_start:-i_end]
+                align_seq1,align_seq2,align_score = SMalignment(candidate_sequence,query_seq)
+                print("find in chromosome "+chr_names[chr_index]+": "+str(candidate_seq_pos+i_start)+' ---> '+str(candidate_seq_pos+i_start+len(candidate_sequence)-1)+" ,align score: "+str(align_score))
+                Display(align_seq1, align_seq2)
+        return None
 
-i = 0
-word = []
-while i <= len(qu)-11:
-    word.append(qu[i:i+11])
-    i += 1
-change = {1:1, 10:2, 11:3, 12:4, 13:5, 14:6, 15:7, 16:8, 17:9, 18:10, 19:11, 2:12, 20:13, 21:14, 22:15, 3:16,
-          4:17, 5:18, 6:19, 7:20, 8:21, 9:22, 23:23, 24:24, 25:25 }
-
-seq2 = ''
-score = 0
-chromosome(word)
-
-end = time.clock()
-print "using time: %fs" % (end - starts)
-print '----------------------------------------------------------------------------------------------'
-
-
+if __name__ == "__main__":
+    chr_names = [str(i+1) for i in range(22)]+['X','Y']
+    chrom_seek_index = np.load('/home/jxiaoae/class/blast/GRCh37_chrom_seek_index.npy')
+    hg19 = open("/home/share/GRCh37/human_g1k_v37.fasta")
+    query_sequence = 'AAATGTGTTGCTGTAGTTTGTTATTAGACCCCTTCTTTCCATTGG'
+    Blast(query_sequence)
