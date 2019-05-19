@@ -15,38 +15,28 @@ Python implementation of Basic Local Alignment Search Tool (BLAST) , which is th
 ## BLAST implementation in python: For human genome
 
 ### Construct library
-<img src="./images/4.png" width=500 height=400 />
->Construct library for human genome. Break whole genome sequence into **11** bases length words overlappedly (**respectively for each chromosome**), every word as a name of a txt file which contain all location of this words in genome sequence. So was the query reads.
+>Construct library for human genome. Break whole genome sequence into **11** bases length words overlappedly, then record the location of each word in liarary file. (**respectively for each chromosome**)
+<img src="./images/4.png" width=700 height=400 />
+
 #### Detail programing 
 
-```bash
-python chromosome.py hg19.fa
-# firstly, cut hg19.fa into individual chromosomes 
-# this will output 25 txt file.
+```python
+python build_library.py 
+# It takes several hours when multiprocessing was applicable
+# reset GRCh37 path and output library file path
 ```
-
-<img src="./images/chromosome.png" width=400 height=500 />
-
-```bash
-python construct_library.py 
-# secondly, cut each chromosme into 11 bases length words overlappedly.
-# this will output total 37G files.
-```
-
-<img src="./images/library.png" width=700 height=400 />
 
 ### alignment algorithms
-<img src="./images/5.jpg" width=300 height=300 />
-> Align query sequence with genome. after cut query sequences into 11 bases length, find all location of each reads by open library files we construct above. 
+> Align query sequence with genome. after cut query sequences into 11 bases length, find all location of each reads from library files we build above. 
 
 <img src="./images/5-2.png" width=700 height=400 />
-> Compare all locations between each 11 bases length words of query sequences. For each words, it will have many location in each chromosome, but only one of them is the right location of query sequnce. For example, as we can see in figue above, word x have locations: a, b, **c**, d..., c is the right location; word x+1 have locations: e, f, **c+1**, g........... c+1 is the right location. Thus, if the query sequence have no mutation and gaps, all the words will have a location like that: **c, c+1, c+2, c+3, c+4..........** besides, if the query sequence have mutation or gaps, all the words will have a location like that: **c, c+1, c+2, c+3,----------------,c+14,c+15....**in orther words, a mutation or gaps will cause 11 wods have no right location. Then, for words from first one to last, locations of each word add length(query) - i, i is the index of words, so we can get the new locations like that: **c+length(query), c+1+length(query)-1, c+2+length(query)-2.......... finally, we can find the right location of the highest repeated location: c+length(query)**, and we can select the bigger threshold of the highest repeated location just like we select the highly similar sequence in NCBI BLAST. the result figure is showed below, we can see the time to find the location and finish sequence alignment only need 2 seconds.
+> Compare all locations between each 11 bases length words of query sequences. For each words, it will have many location in each chromosome, but only one of them is the right location of query sequnce. For example, as we can see in figue above, word x have locations: a, b, **c**, d..., c is the right location; word x+1 have locations: e, f, **c+1**, g........... c+1 is the right location. Thus, if the query sequence have no mutation and gaps, each word will have a location like that: **c, c+1, c+2, c+3,..........** repectively. However, if the query sequence have a mutation or gap, all the words contain the muation of gap will have misleading postions, like that: **c, c+1, c+2,...,c+i-11, misleading postions ,c+i+11....**. Then, for words from first one to last, locations of each word add length(query) - i, i is the index of words, so we can get the new locations like that: **c+length(query), c+1+length(query)-1, c+2+length(query)-2.......... finally, we can find the right location of the highest repeated location: c+length(query)**, and we can select the bigger threshold of the highest repeated number (default: 5) just like we select the highly similar sequence in NCBI BLAST. the result figure is showed below, we can see the time to find the location and finish sequence alignment only need 2 seconds.
 
-```bash 
+```python 
 python blast.py 
 # finally, input query sequence in blast.py 
 # this will output location and Smith,Waterman alignment result.
 ```
 
-<img src="./images/blast.png" width=700 height=400 />
+<img src="./images/blast-result.png" width=400  />
 
