@@ -1,5 +1,5 @@
-# python implement fast BLAST 
-Python implementation of Basic Local Alignment Search Tool (BLAST) , which is the core algorithm in sequence alignment for genomes and only need about 2 seconds to output location and Smith,Waterman alignment result.
+# python implement of fast BLAST 
+Python implementation of Basic Local Alignment Search Tool (BLAST) , which is the core algorithm in sequence alignment for genomes and only it need about 2 seconds to output location and Smith,Waterman alignment result.
 
 **Table of Contents**
 
