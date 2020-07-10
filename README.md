@@ -39,7 +39,7 @@ python blast.py
 # this will output location and Smith,Waterman alignment result.
 ```
 
-<img src="./images/blast-result.png" width=700  />
+<img src="./images/blast-result.png" width=700>
 
 
 
